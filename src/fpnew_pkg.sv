@@ -34,8 +34,8 @@ package fpnew_pkg;
     int unsigned man_bits;
   } fp_encoding_t;
 
-  localparam int unsigned NUM_FP_FORMATS = 6; // change me to add formats
-  localparam int unsigned FP_FORMAT_BITS = $clog2(NUM_FP_FORMATS);
+  parameter int unsigned NUM_FP_FORMATS = 6; // change me to add formats
+  parameter int unsigned FP_FORMAT_BITS = $clog2(NUM_FP_FORMATS);
 
   // FP formats
   typedef enum logic [FP_FORMAT_BITS-1:0] {
@@ -49,7 +49,7 @@ package fpnew_pkg;
   } fp_format_e;
 
   // Encodings for supported FP formats
-  localparam fp_encoding_t [0:NUM_FP_FORMATS-1] FP_ENCODINGS  = '{
+  parameter fp_encoding_t [0:NUM_FP_FORMATS-1] FP_ENCODINGS  = '{
     '{8,  23}, // IEEE binary32 (single)
     '{11, 52}, // IEEE binary64 (double)
     '{5,  10}, // IEEE binary16 (half)
@@ -62,10 +62,10 @@ package fpnew_pkg;
   typedef logic [0:NUM_FP_FORMATS-1]       fmt_logic_t;    // Logic indexed by FP format (for masks)
   typedef logic [0:NUM_FP_FORMATS-1][31:0] fmt_unsigned_t; // Unsigned indexed by FP format
 
-  localparam fmt_logic_t CPK_FORMATS  = 6'b110000; // FP32 and FP64 can provide CPK only
+  parameter fmt_logic_t CPK_FORMATS  = 6'b110000; // FP32 and FP64 can provide CPK only
   // FP32, FP64 cannot be provided for DOTP
   // Small hack: FP32 only enabled for wide enough wrapper input widths for vsum.s instruction
-  localparam fmt_logic_t DOTP_FORMATS = 6'b101111;
+  parameter fmt_logic_t DOTP_FORMATS = 6'b101111;
 
   // ---------
   // INT TYPES
@@ -78,8 +78,8 @@ package fpnew_pkg;
   // | INT64      | 64 bit |
   // *NOTE:* Add new formats only at the end of the enumeration for backwards compatibilty!
 
-  localparam int unsigned NUM_INT_FORMATS = 4; // change me to add formats
-  localparam int unsigned INT_FORMAT_BITS = $clog2(NUM_INT_FORMATS);
+  parameter int unsigned NUM_INT_FORMATS = 4; // change me to add formats
+  parameter int unsigned INT_FORMAT_BITS = $clog2(NUM_INT_FORMATS);
 
   // Int formats
   typedef enum logic [INT_FORMAT_BITS-1:0] {
@@ -113,14 +113,14 @@ package fpnew_pkg;
   // --------------
   // FP OPERATIONS
   // --------------
-  localparam int unsigned NUM_OPGROUPS = 5;
+  parameter int unsigned NUM_OPGROUPS = 5;
 
   // Each FP operation belongs to an operation group
   typedef enum logic [2:0] {
     ADDMUL, DIVSQRT, NONCOMP, CONV, DOTP
   } opgroup_e;
 
-  localparam int unsigned OP_BITS = 5;
+  parameter int unsigned OP_BITS = 5;
 
   typedef enum logic [OP_BITS-1:0] {
     SDOTP, EXVSUM, VSUM,         // DOTP operation group
@@ -219,7 +219,7 @@ package fpnew_pkg;
     ifmt_logic_t IntFmtMask;
   } fpu_features_t;
 
-  localparam fpu_features_t RV64D = '{
+  parameter fpu_features_t RV64D = '{
     Width:         64,
     EnableVectors: 1'b0,
     EnableNanBox:  1'b1,
@@ -227,7 +227,7 @@ package fpnew_pkg;
     IntFmtMask:    4'b0011
   };
 
-  localparam fpu_features_t RV32D = '{
+  parameter fpu_features_t RV32D = '{
     Width:         64,
     EnableVectors: 1'b1,
     EnableNanBox:  1'b1,
@@ -235,7 +235,7 @@ package fpnew_pkg;
     IntFmtMask:    4'b0010
   };
 
-  localparam fpu_features_t RV32F = '{
+  parameter fpu_features_t RV32F = '{
     Width:         32,
     EnableVectors: 1'b0,
     EnableNanBox:  1'b1,
@@ -243,7 +243,7 @@ package fpnew_pkg;
     IntFmtMask:    4'b0010
   };
 
-  localparam fpu_features_t RV64D_Xsflt = '{
+  parameter fpu_features_t RV64D_Xsflt = '{
     Width:         64,
     EnableVectors: 1'b1,
     EnableNanBox:  1'b1,
@@ -251,7 +251,7 @@ package fpnew_pkg;
     IntFmtMask:    4'b1111
   };
 
-  localparam fpu_features_t RV32F_Xsflt = '{
+  parameter fpu_features_t RV32F_Xsflt = '{
     Width:         32,
     EnableVectors: 1'b1,
     EnableNanBox:  1'b1,
@@ -259,7 +259,7 @@ package fpnew_pkg;
     IntFmtMask:    4'b1110
   };
 
-  localparam fpu_features_t RV32F_Xf16alt_Xfvec = '{
+  parameter fpu_features_t RV32F_Xf16alt_Xfvec = '{
     Width:         32,
     EnableVectors: 1'b1,
     EnableNanBox:  1'b1,
@@ -275,7 +275,7 @@ package fpnew_pkg;
     pipe_config_t          PipeConfig;
   } fpu_implementation_t;
 
-  localparam fpu_implementation_t DEFAULT_NOREGS = '{
+  parameter fpu_implementation_t DEFAULT_NOREGS = '{
     PipeRegs:   '{default: 0},
     UnitTypes:  '{'{default: PARALLEL}, // ADDMUL
                   '{default: MERGED},   // DIVSQRT
@@ -285,7 +285,7 @@ package fpnew_pkg;
     PipeConfig: BEFORE
   };
 
-  localparam fpu_implementation_t DEFAULT_SNITCH = '{
+  parameter fpu_implementation_t DEFAULT_SNITCH = '{
     PipeRegs:   '{default: 1},
     UnitTypes:  '{'{default: PARALLEL}, // ADDMUL
                   '{default: DISABLED}, // DIVSQRT
@@ -298,7 +298,7 @@ package fpnew_pkg;
   // -----------------------
   // Synthesis optimization
   // -----------------------
-  localparam logic DONT_CARE = 1'b1; // the value to assign as don't care
+  parameter logic DONT_CARE = 1'b1; // the value to assign as don't care
 
   // -------------------------
   // General helper functions
