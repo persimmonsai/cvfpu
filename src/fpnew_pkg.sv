@@ -66,13 +66,13 @@ package fpnew_pkg;
   function automatic fp_encoding_t FP_ENCODINGS(fp_format_e fmt);
       automatic fp_encoding_t enc = '{'0, '0};
       case (fmt)
-        FP32: enc = '{8, 32};   // IEEE binary32 (single)
+        FP32: enc = '{8, 23};   // IEEE binary32 (single)
         FP64: enc = '{11, 52};  // IEEE binary64 (double)
         FP16: enc = '{5, 10};   // IEEE binary16 (half)
         FP8: enc = '{5, 2};     // custom binary8
         FP16ALT: enc = '{8, 7}; // custom binary16alt
         FP8ALT: enc = '{4, 3};  // custom binary8alt
-        default: enc = '{8, 32};
+        default: enc = '{11, 52};
       endcase
       return enc;
   endfunction
