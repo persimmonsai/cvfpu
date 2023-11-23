@@ -16,6 +16,7 @@
 `include "common_cells/registers.svh"
 
 module fpnew_divsqrt_multi #(
+  parameter                          OUTPUT_DELAY_STAGES = 4,
   parameter fpnew_pkg::fmt_logic_t   FpFmtConfig  = '1,
   // FPU configuration
   parameter int unsigned             NumPipeRegs = 0,
@@ -269,11 +270,39 @@ module fpnew_divsqrt_multi #(
    .Precision_ctl_SI ( '0                  ),
    .Format_sel_SI    ( divsqrt_fmt         ),
    .Kill_SI          ( flush_i             ),
-   .Result_DO        ( unit_result         ),
-   .Fflags_SO        ( unit_status         ),
-   .Ready_SO         ( unit_ready          ),
-   .Done_SO          ( unit_done           )
+   .Result_DO        ( unit_result_d         ),
+   .Fflags_SO        ( unit_status_d         ),
+   .Ready_SO         ( unit_ready_d          ),
+   .Done_SO          ( unit_done_d           )
   );
+
+   logic [C_OP_FP64-1:0]           unit_result_d;
+
+   logic [4:0]                     unit_status_d;
+   logic                           unit_ready_d;
+   logic                           unit_done_d;
+
+   logic [C_OP_FP64-1:0] unit_result_p[0:OUTPUT_DELAY_STAGES];
+   logic [4:0]           unit_status_p[0:OUTPUT_DELAY_STAGES];
+   logic                 unit_ready_p[0:OUTPUT_DELAY_STAGES];
+   logic                 unit_done_p[0:OUTPUT_DELAY_STAGES];
+
+   assign unit_result_p[0] = unit_result_d;
+   assign unit_status_p[0] = unit_status_d;
+   assign unit_ready_p[0] = unit_ready_d;
+   assign unit_done_p[0] = unit_done_d;
+
+   for (genvar i = 0; i < OUTPUT_DELAY_STAGES; i++) begin : div_io_pipeline
+      `FFL(unit_result_p[i+1], unit_result_p[i], '1, '0)
+      `FFL(unit_status_p[i+1], unit_status_p[i], '1, '0)
+      `FFL(unit_ready_p[i+1], unit_ready_p[i], '1, '0)
+      `FFL(unit_done_p[i+1], unit_done_p[i], '1, '0)
+   end
+
+   assign unit_result = unit_result_p[OUTPUT_DELAY_STAGES];
+   assign unit_status = unit_status_p[OUTPUT_DELAY_STAGES];
+   assign unit_ready = unit_ready_p[OUTPUT_DELAY_STAGES];
+   assign unit_done = unit_done_p[OUTPUT_DELAY_STAGES];
 
   // Adjust result width and fix FP8
   assign adjusted_result = result_is_fp8_q ? unit_result >> 8 : unit_result;
