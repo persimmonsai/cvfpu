@@ -71,7 +71,8 @@ package fpnew_pkg;
         FP16: enc = '{5, 10};   // IEEE binary16 (half)
         FP8: enc = '{5, 2};     // custom binary8
         FP16ALT: enc = '{8, 7}; // custom binary16alt
-        default: enc = '{11, 52};
+        FP8ALT: enc = '{4,  3};
+        default: enc = '{-1, -1};
       endcase
       return enc;
   endfunction
